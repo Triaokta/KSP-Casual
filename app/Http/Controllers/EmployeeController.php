@@ -13,9 +13,21 @@ class EmployeeController extends Controller
     /**
      * Menampilkan daftar semua karyawan.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $employees = Employee::with('department')->latest()->get();
+        // Mulai query ke model Employee
+        $query = Employee::query()->with('department');
+
+        // Jika ada input pencarian 'search'
+        if ($request->filled('search')) {
+            // Lakukan pencarian pada kolom 'name'
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        // Ambil data yang sudah difilter, urutkan dari yang terbaru, dan gunakan paginasi
+        $employees = $query->latest()->paginate(10); // Menampilkan 10 data per halaman
+
+        // Kirim data ke view
         return view('employees.index', compact('employees'));
     }
 

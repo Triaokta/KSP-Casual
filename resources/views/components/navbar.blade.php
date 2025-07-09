@@ -10,17 +10,28 @@
     </div>
 
     <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-        <div class="navbar-nav align-items-center">
-            <div class="nav-item d-flex align-items-center">
-                <i class="bx bx-search fs-4 lh-0"></i>
-                <input type="text" class="form-control border-0 shadow-none" placeholder="Search..."/>
+        <!-- Search -->
+        <form action="{{ route('employees.index') }}" method="GET" class="w-100">
+            <div class="navbar-nav align-items-center">
+                <div class="nav-item d-flex align-items-center w-100">
+                    <i class="bx bx-search fs-4 lh-0"></i>
+                    <input
+                        type="text"
+                        class="form-control border-0 shadow-none"
+                        name="search"
+                        placeholder="Cari nama karyawan..."
+                        aria-label="Cari nama karyawan..."
+                        value="{{ request('search') }}"
+                    />
+                </div>
             </div>
-        </div>
+        </form>
+        <!-- /Search -->
+
         <ul class="navbar-nav flex-row align-items-center ms-auto">
             <li class="nav-item navbar-dropdown dropdown-user dropdown">
                 <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
                     <div class="avatar avatar-online">
-                        {{-- Gunakan ikon user generik untuk sementara --}}
                         <i class='bx bxs-user-circle' style='font-size: 40px;'></i>
                     </div>
                 </a>
@@ -29,7 +40,6 @@
                         <div class="dropdown-divider"></div>
                     </li>
                     <li>
-                        {{-- Tombol Logout --}}
                         <form action="{{ route('logout') }}" method="post" onsubmit="return confirm('Anda yakin ingin logout?');">
                             @csrf
                             <button type="submit" class="dropdown-item cursor-pointer">

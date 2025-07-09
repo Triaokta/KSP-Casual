@@ -18,11 +18,11 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Nomor Induk Karyawan</th>
-                        <th>Nama</th>
-                        <th>Departemen/Divisi</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
+                        <th>NOMOR KARYAWAN</th>
+                        <th>NAMA</th>
+                        <th>DEPARTEMEN</th>
+                        <th>STATUS</th>
+                        <th>AKSI</th>
                     </tr>
                 </thead>
                 <tbody class="table-border-bottom-0">
@@ -39,9 +39,7 @@
                             @endif
                         </td>
                         <td>
-                            {{-- TOMBOL BARU --}}
                             <a href="{{ route('employees.show', $employee->id) }}" class="btn btn-sm btn-info">Detail</a>
-
                             <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-sm btn-warning">Edit</a>
                             
                             <form action="{{ route('employees.toggle_status', $employee->id) }}" method="POST" class="d-inline">
@@ -62,11 +60,22 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="text-center">Belum ada data karyawan.</td>
+                        <td colspan="5" class="text-center">
+                            @if(request('search'))
+                                Karyawan dengan nama "{{ request('search') }}" tidak ditemukan.
+                            @else
+                                Belum ada data karyawan.
+                            @endif
+                        </td>
                     </tr>
                     @endforelse
                 </tbody>
             </table>
+        </div>
+
+        {{-- (BARU) Link Paginasi --}}
+        <div class="card-footer">
+            {{ $employees->appends(request()->except('page'))->links() }}
         </div>
     </div>
 </div>
