@@ -35,5 +35,13 @@
                 <div>Karyawan Casual</div>
             </a>
         </li>
+
+        <li class="menu-item {{ \Illuminate\Support\Facades\Route::is('import.*') ? 'active' : '' }}">
+            <a href="{{ route('import.karyawan.form') }}" class="menu-link">
+                <i class="menu-icon bx bx-download me-1"></i>    
+                <div>Import Karyawan</div>
+            </a>
+        </li>
+
     </ul>
 </aside>

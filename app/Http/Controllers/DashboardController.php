@@ -12,9 +12,9 @@ class DashboardController extends Controller
     {
         // Data dummy untuk testing, nanti bisa diambil dari database
         $todayLetterTransaction = 12;
-        $todayIncomingLetter = 5;
+        $activeEmployees = Employee::where('is_active', 1)->count();
+        $inactiveEmployees = Employee::where('is_active', 0)->count();
         $todayOutgoingLetter = 4;
-        $todayDispositionLetter = 3;
 
         $totalYesterday = 10; // nilai acuan untuk menghitung persen
 
@@ -31,14 +31,8 @@ class DashboardController extends Controller
         return view('pages.dashboard', [
             'greeting' => 'Selamat Datang!',
             'currentDate' => Carbon::now()->translatedFormat('l, d F Y'),
-            'todayLetterTransaction' => $todayLetterTransaction,
-            'todayIncomingLetter' => $todayIncomingLetter,
-            'todayOutgoingLetter' => $todayOutgoingLetter,
-            'todayDispositionLetter' => $todayDispositionLetter,
-            'percentageLetterTransaction' => $percentageLetterTransaction,
-            'percentageIncomingLetter' => $percentageIncomingLetter,
-            'percentageOutgoingLetter' => $percentageOutgoingLetter,
-            'percentageDispositionLetter' => $percentageDispositionLetter,
+            'activeEmployees' => $activeEmployees,
+            'inactiveEmployees' => $inactiveEmployees,
             'totalEmployees' => $totalEmployees,
 
         ]);

@@ -5,34 +5,35 @@ namespace App\Http\Controllers;
 use App\Models\Employee;
 use App\Models\Department;
 use Illuminate\Http\Request;
+use App\Exports\EmployeesExport;
+use App\Imports\ImportKaryawan;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Imports\EmployeesImport;
+use Maatwebsite\Excel\Imports\HeadingRowImport;
+
 
 class EmployeeController extends Controller
 {
     /**
-     * Menampilkan daftar semua karyawan.
+     * Menampilkan daftar semua karyawan dengan fitur pencarian.
      */
     public function index(Request $request)
     {
-        // Mulai query ke model Employee
         $query = Employee::query()->with('department');
 
-        // Jika ada input pencarian 'search'
         if ($request->filled('search')) {
-            // Lakukan pencarian pada kolom 'name'
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
-        // Ambil data yang sudah difilter, urutkan dari yang terbaru, dan gunakan paginasi
-        $employees = $query->latest()->paginate(10); // Menampilkan 10 data per halaman
+        // ⬇️ Tambahkan ini untuk mengurutkan berdasarkan 'employee_id' (nomor induk)
+        $query->orderBy('employee_id', 'asc');
 
-        // Kirim data ke view
+        $employees = $query->paginate(10);
+
         return view('employees.index', compact('employees'));
     }
 
     /**
-     * Menampilkan form untuk membuat karyawan baru di halaman terpisah.
+     * Menampilkan form untuk membuat karyawan baru.
      */
     public function create()
     {
@@ -61,7 +62,7 @@ class EmployeeController extends Controller
         return redirect()->route('employees.index')
                          ->with('success', 'Karyawan baru berhasil ditambahkan.');
     }
-    
+
     /**
      * Menampilkan detail spesifik seorang karyawan.
      */
@@ -71,7 +72,7 @@ class EmployeeController extends Controller
     }
 
     /**
-     * Menampilkan form untuk mengedit data karyawan di halaman terpisah.
+     * Menampilkan form untuk mengedit data karyawan.
      */
     public function edit(Employee $employee)
     {
@@ -120,9 +121,9 @@ class EmployeeController extends Controller
         $employee->save();
         return redirect()->back()->with('success', 'Status karyawan berhasil diubah.');
     }
-    
+
     /**
-     * Menampilkan halaman form untuk import.
+     * (BARU) Menampilkan halaman form untuk import.
      */
     public function importForm()
     {
@@ -130,8 +131,9 @@ class EmployeeController extends Controller
     }
 
     /**
-     * Menangani proses import data dari file Excel.
+     * (BARU) Menangani proses import data dari file Excel.
      */
+    
     public function importStore(Request $request)
     {
         $request->validate([
@@ -139,16 +141,18 @@ class EmployeeController extends Controller
         ]);
 
         try {
-            Excel::import(new EmployeesImport, $request->file('file'));
-        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
-            return redirect()->route('employees.import.form')->with('import_errors', $e->failures());
+            Excel::import(new \App\Imports\ImportKaryawan, $request->file('file'));
+            return redirect()->route('employees.index')->with('success', 'Data berhasil diimpor!');
+        } catch (\Throwable $e) {
+            \Log::error('❌ Gagal import: ' . $e->getMessage());
+            return back()->withErrors(['file' => 'Import gagal: ' . $e->getMessage()]);
         }
-
-        return redirect()->route('employees.index')->with('success', 'Data karyawan berhasil diimpor.');
     }
 
+
+
     /**
-     * Mengunduh file template Excel.
+     * (BARU) Mengunduh file template Excel.
      */
     public function template()
     {
@@ -160,4 +164,24 @@ class EmployeeController extends Controller
 
         return response()->download($filePath);
     }
+
+    /**
+     * (BARU) Menangani proses ekspor data ke file Excel.
+     */
+    public function export()
+    {
+        return Excel::download(new EmployeesExport, 'daftar_karyawan.xlsx');
+    }
+
+    public function downloadTemplate()
+    {
+        $filePath = public_path('templates/template_karyawan.xlsx');
+
+        if (!file_exists($filePath)) {
+            return back()->withErrors(['file' => 'File template tidak ditemukan.']);
+        }
+
+        return response()->download($filePath);
+    }
+
 }

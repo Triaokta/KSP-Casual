@@ -13,6 +13,8 @@ class Employee extends Model
      * Tentukan kolom mana saja yang boleh diisi secara massal.
      * @var array<int, string>
      */
+    
+    protected $table = 'employees';
     protected $fillable = [
         'employee_id',
         'name',

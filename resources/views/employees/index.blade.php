@@ -11,16 +11,22 @@
     @endif
 
     <div class="card">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            {{-- Hanya ada satu tombol Tambah Karyawan di sini --}}
             <a href="{{ route('employees.create') }}" class="btn btn-primary">Tambah Karyawan Baru</a>
+            
+            {{-- Tombol untuk Export Excel --}}
+            <a href="{{ route('employees.export') }}" class="btn btn-success">
+                <i class="bx bx-upload me-1"></i> Export Excel
+            </a>
         </div>
         <div class="table-responsive text-nowrap">
             <table class="table">
                 <thead>
                     <tr>
-                        <th>NOMOR KARYAWAN</th>
+                        <th>NOMOR INDUK KARYAWAN</th>
                         <th>NAMA</th>
-                        <th>DEPARTEMEN</th>
+                        <th>DEPARTEMEN/DIVISI</th>
                         <th>STATUS</th>
                         <th>AKSI</th>
                     </tr>
@@ -73,7 +79,7 @@
             </table>
         </div>
 
-        {{-- (BARU) Link Paginasi --}}
+        {{-- Link Paginasi --}}
         <div class="card-footer">
             {{ $employees->appends(request()->except('page'))->links() }}
         </div>
