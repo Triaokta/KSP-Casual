@@ -24,13 +24,18 @@ class EmployeeController extends Controller
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
-        // ⬇️ Tambahkan ini untuk mengurutkan berdasarkan 'employee_id' (nomor induk)
+        if ($request->filled('department_id')) {
+            $query->where('department_id', $request->department_id);
+        }
+
         $query->orderBy('employee_id', 'asc');
 
         $employees = $query->paginate(10);
+        $departments = Department::orderBy('name')->get();
 
-        return view('employees.index', compact('employees'));
+        return view('employees.index', compact('employees', 'departments'));
     }
+
 
     /**
      * Menampilkan form untuk membuat karyawan baru.

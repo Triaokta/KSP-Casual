@@ -11,45 +11,36 @@
 
     <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
         <!-- Search -->
-        <form action="{{ route('employees.index') }}" method="GET" class="w-100">
-            <div class="navbar-nav align-items-center">
-                <div class="nav-item d-flex align-items-center w-100">
-                    <i class="bx bx-search fs-4 lh-0"></i>
-                    <input
-                        type="text"
-                        class="form-control border-0 shadow-none"
-                        name="search"
-                        placeholder="Cari nama karyawan..."
-                        aria-label="Cari nama karyawan..."
-                        value="{{ request('search') }}"
-                    />
-                </div>
-            </div>
-        </form>
-        <!-- /Search -->
+        <form action="{{ route('employees.index') }}" method="GET" class="d-flex w-100 gap-2 align-items-center">
+        {{-- Input Pencarian --}}
+        <div class="input-group">
+            <span class="input-group-text border-0 bg-white">
+                <i class="bx bx-search fs-4 lh-0"></i>
+            </span>
+            <input
+                type="text"
+                class="form-control border-0 shadow-none"
+                name="search"
+                placeholder="Cari nama karyawan..."
+                aria-label="Cari nama karyawan..."
+                value="{{ request('search') }}"
+            />
+        </div>
 
-        <ul class="navbar-nav flex-row align-items-center ms-auto">
-            <li class="nav-item navbar-dropdown dropdown-user dropdown">
-                <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
-                    <div class="avatar avatar-online">
-                        <i class='bx bxs-user-circle' style='font-size: 40px;'></i>
-                    </div>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end mt-2">
-                    <li>
-                        <div class="dropdown-divider"></div>
-                    </li>
-                    <li>
-                        <form action="{{ route('logout') }}" method="post" onsubmit="return confirm('Anda yakin ingin logout?');">
-                            @csrf
-                            <button type="submit" class="dropdown-item cursor-pointer">
-                                <i class="bx bx-power-off me-2"></i>
-                                <span class="align-middle">Log Out</span>
-                            </button>
-                        </form>
-                    </li>
-                </ul>
-            </li>
-        </ul>
-    </div>
+        {{-- Dropdown Departemen --}}
+        <select
+            name="department_id"
+            class="form-select border-0 shadow-none"
+            onchange="this.form.submit()"
+            style="max-width: 200px;"
+        >
+            <option value="">Pilih Departemen</option>
+            @foreach($departments as $dept)
+                <option value="{{ $dept->id }}" {{ request('department_id') == $dept->id ? 'selected' : '' }}>
+                    {{ $dept->name }}
+                </option>
+            @endforeach
+        </select>
+    </form>
+
 </nav>

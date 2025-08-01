@@ -97,7 +97,18 @@
         <!-- Layout container -->
         <div class="layout-page">
             <!-- Navbar -->
-            @include('components.navbar')
+            @if (!in_array(Route::currentRouteName(), ['dashboard', 'import.karyawan.form']))
+                <!-- Navbar -->
+            @php
+                $hideNavbarOn = ['dashboard', 'import.karyawan.form', 'employees.create'];
+            @endphp
+
+            @if (!in_array(Route::currentRouteName(), $hideNavbarOn))
+                @include('components.navbar')
+            @endif
+            <!-- / Navbar -->
+
+            @endif
             <!-- / Navbar -->
 
             <!-- Content wrapper -->
