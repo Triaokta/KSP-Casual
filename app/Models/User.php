@@ -107,12 +107,9 @@ class User extends Authenticatable
     /**
      * Accessor: profile picture
      */
-    public function profilePicture(): Attribute
+    public function getProfilePictureAttribute($value)
     {
-        return Attribute::make(
-            get: fn ($value) =>
-                $value ?: 'https://ui-avatars.com/api/?background=6D67E4&color=fff&name=' . urlencode($this->name)
-        );
+        return $value ?: 'https://ui-avatars.com/api/?background=6D67E4&color=fff&name=' . urlencode($this->name);
     }
 
     // Scopes

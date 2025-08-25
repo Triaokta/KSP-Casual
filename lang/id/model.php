@@ -37,7 +37,7 @@ return [
     ],
     'user' => [
         'name' => 'Nama',
-        'email' => 'Surel',
+        'email' => 'Email',
         'password' => 'Kata Sandi',
         'phone' => 'Nomor Telepon',
         'role' => 'Peran',

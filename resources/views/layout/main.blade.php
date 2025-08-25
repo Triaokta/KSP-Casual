@@ -154,13 +154,13 @@
 <script>
     $(document).on('click', '.btn-delete', function (req) {
         Swal.fire({
-            title: '{{ __('menu.general.delete_confirm') }}',
-            text: "{{ __('menu.general.delete_warning') }}",
+            title: 'Konfirmasi Hapus',
+            text: "Data yang dihapus tidak dapat dikembalikan!",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#696cff',
-            confirmButtonText: '{{ __('menu.general.delete') }}',
-            cancelButtonText: '{{ __('menu.general.cancel') }}'
+            confirmButtonText: 'Delete',
+            cancelButtonText: 'Cancel'
         }).then((result) => {
             if (result.isConfirmed) {
                 $(this).parent('form').submit();

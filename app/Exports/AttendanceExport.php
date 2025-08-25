@@ -65,15 +65,21 @@ class AttendanceExport implements FromCollection, WithHeadings, WithMapping, Wit
         static $rowNumber = 0;
         $rowNumber++;
         
-        $status = ucfirst($attendance->status);
+        // Format status untuk tampilan yang lebih baik
+        $status = $attendance->status;
+        if ($status === 'tanpa_keterangan') {
+            $status = 'Tanpa Keterangan';
+        } else {
+            $status = ucfirst($status);
+        }
         
         return [
             $rowNumber,
             $attendance->date->format('d/m/Y'),
             $attendance->employee->employee_id,
             $attendance->employee->name,
-            $attendance->time_in,
-            $attendance->time_out ?? '-',
+            $attendance->time_in_formatted,
+            $attendance->time_out_formatted,
             $status,
             $attendance->notes ?? '-',
         ];

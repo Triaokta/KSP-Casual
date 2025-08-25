@@ -51,16 +51,17 @@
                             </div>
                         </div>
 
-                        <div class="row g-3 mb-4">
+                        <div class="row g-3 mb-4" id="timeFields">
                             <div class="col-md-6">
                                 <label for="time_in" class="form-label">Jam Masuk</label>
-                                <input type="time" class="form-control" id="time_in" name="time_in" value="{{ old('time_in', '08:00') }}" required>
+                                <input type="time" class="form-control" id="time_in" name="time_in" value="{{ old('time_in') }}">
+                                <input type="hidden" id="time_in_display" name="time_in_display" value="-">
                             </div>
 
                             <div class="col-md-6">
                                 <label for="time_out" class="form-label">Jam Keluar</label>
-                                <input type="time" class="form-control" id="time_out" name="time_out" value="{{ old('time_out', '17:00') }}">
-                                <small class="text-muted">Kosongkan jika belum pulang</small>
+                                <input type="time" class="form-control" id="time_out" name="time_out" value="{{ old('time_out') }}">
+                                <input type="hidden" id="time_out_display" name="time_out_display" value="-">
                             </div>
                         </div>
 
@@ -92,4 +93,71 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const statusSelect = document.getElementById('status');
+        const timeFields = document.getElementById('timeFields');
+        
+        // Fungsi untuk mengatur visibilitas field waktu berdasarkan status
+        function toggleTimeFields() {
+            if (statusSelect.value === 'hadir') {
+                timeFields.style.display = 'flex';
+                document.getElementById('time_in').setAttribute('required', 'required');
+                // Update hidden fields jika ada nilai
+                if (document.getElementById('time_in').value) {
+                    document.getElementById('time_in_display').value = document.getElementById('time_in').value;
+                } else {
+                    document.getElementById('time_in_display').value = '-';
+                }
+                
+                if (document.getElementById('time_out').value) {
+                    document.getElementById('time_out_display').value = document.getElementById('time_out').value;
+                } else {
+                    document.getElementById('time_out_display').value = '-';
+                }
+            } else {
+                timeFields.style.display = 'none';
+                document.getElementById('time_in').removeAttribute('required');
+                document.getElementById('time_in').value = '';
+                document.getElementById('time_out').value = '';
+                // Set nilai display ke strip
+                document.getElementById('time_in_display').value = '-';
+                document.getElementById('time_out_display').value = '-';
+            }
+        }
+        
+        // Jalankan saat halaman dimuat
+        toggleTimeFields();
+        
+        // Jalankan saat status berubah
+        statusSelect.addEventListener('change', toggleTimeFields);
+        
+        // Event listeners untuk update nilai display saat nilai waktu berubah
+        document.getElementById('time_in').addEventListener('change', function() {
+            if (this.value) {
+                document.getElementById('time_in_display').value = this.value;
+            } else {
+                document.getElementById('time_in_display').value = '-';
+            }
+        });
+        
+        document.getElementById('time_out').addEventListener('change', function() {
+            if (this.value) {
+                document.getElementById('time_out_display').value = this.value;
+            } else {
+                document.getElementById('time_out_display').value = '-';
+            }
+        });
+        
+        // Tambahkan event listener untuk tanggal
+        const dateInput = document.getElementById('date');
+        dateInput.addEventListener('change', function() {
+            // Redirect dengan tanggal baru untuk memperbarui daftar karyawan
+            window.location.href = "{{ route('attendance.create') }}?date=" + this.value;
+        });
+    });
+</script>
+@endpush
 @endsection

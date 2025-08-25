@@ -29,8 +29,7 @@
         const chart = new ApexCharts(document.querySelector("#today-graphic"), options);
 
         chart.render();
-        
-        // Script untuk otomatis submit form saat departemen dipilih
+
         document.getElementById('department_id').addEventListener('change', function() {
             document.getElementById('departmentFilterForm').submit();
         });

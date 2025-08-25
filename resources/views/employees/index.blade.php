@@ -28,11 +28,9 @@
                 <a href="{{ route('employees.create') }}" class="btn btn-primary">Tambah Karyawan Baru</a>
             </div>
             <div>
-                {{-- Tombol untuk Export Excel --}}
                 <a href="{{ route('employees.export') }}" class="btn btn-success me-2">
                     <i class="bx bx-upload me-1"></i> Export Excel
                 </a>
-                {{-- Tombol untuk Export PDF --}}
                 <a href="{{ route('employees.export.pdf') }}" class="btn btn-warning">
                     <i class="bx bxs-file-pdf me-1"></i> Export PDF
                 </a>
@@ -97,7 +95,6 @@
             </table>
         </div>
 
-        {{-- Link Paginasi --}}
         <div class="card-footer">
             {{ $employees->appends(request()->except('page'))->links() }}
         </div>

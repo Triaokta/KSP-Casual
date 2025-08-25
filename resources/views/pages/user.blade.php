@@ -25,7 +25,7 @@
 @section('content')
     <x-breadcrumb :values="[__('menu.users')]">
         <button type="button" class="btn btn-primary btn-create" data-bs-toggle="modal" data-bs-target="#createModal">
-            {{ __('menu.general.create') }}
+            Create
         </button>
     </x-breadcrumb>
 

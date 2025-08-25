@@ -60,9 +60,17 @@
                                                 'tanpa_keterangan' => 'danger'
                                             ];
                                             $color = $statusColors[$attendance->status] ?? 'secondary';
+                                            
+                                            // Format status untuk tampilan yang lebih baik
+                                            $statusText = $attendance->status;
+                                            if ($statusText == 'tanpa_keterangan') {
+                                                $statusText = 'Tanpa Keterangan';
+                                            } else {
+                                                $statusText = ucfirst($statusText);
+                                            }
                                         @endphp
                                         <span class="badge bg-{{ $color }}">
-                                            {{ ucfirst($attendance->status) }}
+                                            {{ $statusText }}
                                         </span>
                                     </td>
                                 </tr>

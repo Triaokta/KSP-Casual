@@ -45,7 +45,7 @@
                                 </select>
                             </div>
                             <div class="col-md-2 d-flex align-items-end">
-                                <button type="submit" class="btn btn-primary w-100">Terapkan Filter</button>
+                                <button type="submit" class="btn btn-primary w-100">Filter</button>
                             </div>
                         </div>
                     </form>
@@ -116,6 +116,13 @@
                         ]) }}" class="btn btn-success" id="btn-export-excel">
                             <i class="bx bx-export me-1"></i> Export Excel
                         </a>
+                        <a href="{{ route('attendance.export-pdf', [
+                            'start_date' => $startDate, 
+                            'end_date' => $endDate,
+                            'employee_id' => $employeeId
+                        ]) }}" class="btn btn-primary" id="btn-export-pdf">
+                            <i class="bx bx-file me-1"></i> Export PDF
+                        </a>
                         <button type="button" class="btn btn-danger" onclick="window.print()">
                             <i class="bx bx-printer me-1"></i> Print
                         </button>
@@ -142,8 +149,8 @@
                                             <td>{{ $index + 1 }}</td>
                                             <td>{{ $attendance->date->format('d/m/Y') }}</td>
                                             <td>{{ $attendance->employee->name }} ({{ $attendance->employee->employee_id }})</td>
-                                            <td>{{ $attendance->time_in }}</td>
-                                            <td>{{ $attendance->time_out ?? '-' }}</td>
+                                            <td>{{ $attendance->time_in_formatted }}</td>
+                                            <td>{{ $attendance->time_out_formatted }}</td>
                                             <td>
                                                 @php
                                                     $statusColors = [
@@ -154,9 +161,17 @@
                                                         'tanpa_keterangan' => 'danger'
                                                     ];
                                                     $color = $statusColors[$attendance->status] ?? 'secondary';
+                                                    
+                                                    // Format status untuk tampilan yang lebih baik
+                                                    $statusText = $attendance->status;
+                                                    if ($statusText == 'tanpa_keterangan') {
+                                                        $statusText = 'Tanpa Keterangan';
+                                                    } else {
+                                                        $statusText = ucfirst($statusText);
+                                                    }
                                                 @endphp
                                                 <span class="badge bg-{{ $color }}">
-                                                    {{ ucfirst($attendance->status) }}
+                                                    {{ $statusText }}
                                                 </span>
                                             </td>
                                             <td>{{ $attendance->notes ?? '-' }}</td>
@@ -179,10 +194,10 @@
 @push('script')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Tambahkan loading state saat tombol export diklik
-        const btnExport = document.getElementById('btn-export-excel');
-        if (btnExport) {
-            btnExport.addEventListener('click', function() {
+        // Tambahkan loading state saat tombol export Excel diklik
+        const btnExportExcel = document.getElementById('btn-export-excel');
+        if (btnExportExcel) {
+            btnExportExcel.addEventListener('click', function() {
                 // Disable button dan tampilkan status loading
                 this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses...';
                 this.disabled = true;
@@ -190,6 +205,22 @@
                 // Set timeout untuk enable button kembali jika terjadi masalah
                 setTimeout(() => {
                     this.innerHTML = '<i class="bx bx-export me-1"></i> Export Excel';
+                    this.disabled = false;
+                }, 10000); // 10 detik timeout
+            });
+        }
+        
+        // Tambahkan loading state saat tombol export PDF diklik
+        const btnExportPdf = document.getElementById('btn-export-pdf');
+        if (btnExportPdf) {
+            btnExportPdf.addEventListener('click', function() {
+                // Disable button dan tampilkan status loading
+                this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses...';
+                this.disabled = true;
+                
+                // Set timeout untuk enable button kembali jika terjadi masalah
+                setTimeout(() => {
+                    this.innerHTML = '<i class="bx bx-file me-1"></i> Export PDF';
                     this.disabled = false;
                 }, 10000); // 10 detik timeout
             });

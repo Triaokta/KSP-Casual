@@ -6,7 +6,6 @@
 
     <div class="card mb-4">
         <div class="card-body">
-            {{-- Arahkan form ke rute 'employees.store' dengan method POST --}}
             <form action="{{ route('employees.store') }}" method="POST">
                 @csrf
                 @include('employees._form')

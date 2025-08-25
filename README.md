@@ -5,57 +5,35 @@
 </p>
 
 
-## Laravel Surat Menyurat v1 🚀
+## KSP-LMS 🚀
 
-Sebuah aplikasi web yang dirancang untuk mengelola surat masuk, keluar, dan disposisi dengan lebih efisien, cepat, dan terorganisir. Dengan fitur pencatatan, pencarian, serta pelacakan surat yang intuitif, proses administrasi jadi lebih simpel dan nggak ribet!
+Sebuah aplikasi web yang dirancang untuk mengelola karyawan casual, mulai dari input karyawan, import karyawan dengan menggunakan excel, export karyawan dengan tipe xlsx, export karyawan dengan tipe pdf. Selain itu, aplikasi web ini juga menyediakan fitur absensi perhari, sehingga memudahkan admin ketika menghitung gaji karyawan.
 
 ## ✨ Fitur Andalan
 
 - **🔑 Autentikasi & Hak Akses**  
   - Login/logout gampang
-  - Hak akses berbasis peran (admin, staff) biar nggak semua orang bisa asal ubah
 - **📊 Dashboard Super Informatif**  
-  - Statistik jumlah surat masuk, keluar, dan disposisi hari ini
-  - Statistik jumlah transaksi surat hari ini
-  - Jumlah pengguna aktif
-  - Persentase kenaikan/penurunan surat & transaksi surat
-- **📥 Manajemen Surat Masuk**  
-  - Tambah, edit, hapus, dan lihat detail surat masuk
-  - Pencarian cepat berdasarkan pengirim, nomor surat, atau nomor agenda
-  - Kelola lampiran surat masuk dengan mudah
-  - Tambah & hapus disposisi surat
-- **📤 Manajemen Surat Keluar**  
-  - Tambah, edit, hapus, dan lihat detail surat keluar
-  - Pencarian gampang berdasarkan pengirim, nomor surat, atau nomor agenda
-  - Kelola lampiran surat keluar
-- **📅 Agenda Surat**  
-  - Cari surat masuk & keluar berdasarkan tanggal
-  - Cetak agenda surat masuk & keluar
-- **🖼️ Galeri Surat**  
-  - Lihat dan unduh lampiran surat masuk & keluar
-- **📂 Referensi Data**  
-  - Klasifikasi surat (tambah, edit, hapus)
-  - Status sifat surat (tambah, edit, hapus)
-- **👥 Kelola Pengguna (Admin)**  
-  - Tambah, edit, hapus, dan nonaktifkan pengguna
-  - Reset password pengguna dengan mudah
+  - Statistik jumlah karyawan casual secara keseluruhan, jumlah karyawan aktif, dan jumlah karyawan nonaktif
+  - Jumlah karyawan dapat difilter berdasarkan departemen
+- **👥 Manajemen Karyawan**  
+  - Tambah, edit, hapus, ubah status, dan lihat detail karyawan casual
+  - Pencarian cepat berdasarkan nama atau departemen
+  - Untuk menambahkan karyawan dapat dilakukan import xlsx yang templatenya sudah disediakan dan dapat diunduh serta diedit
+  - Data karyawan aktif dapat diunduh dengan format xlsx ataupun pdf
+- **📅 Absensi**  
+  - Absen dapat ditambahkan perharinya 
+  - Jika karyawan nonaktif maka namanya tidak akan ada di dalam daftar absensi
+  - Tidak dapat melakukan absen 2x dalam 1 hari yang sama
+  - Data absensi dapat diunduh secara keseluruhan karyawan
+  - Data absensi dapat diunduh untuk karyawan yang dipilih untuk diunduh
 - **🛠️ Pengaturan Profil**  
-  - Ubah nama, email, dan nomor telepon
-  - Ganti foto profil biar makin kece
-  - Nonaktifkan akun (khusus staff)
-- **⚙️ Pengaturan Sistem (Admin)**  
-  - Konfigurasi kata sandi bawaan
-  - Atur jumlah data per halaman
-  - Ubah identitas aplikasi & institusi (nama, alamat, kontak)
-
-## 🛢️ Skema Database
-![Database Schema](docs/database_schema.png)
-
-Bisa didownload di [sini](docs/surat.sql).
+  - Ubah nama, email, dan password
+  - Ganti foto profil
 
 ## ⚡ Instalasi Super Cepat
 ### 🔥 Persyaratan
-- **PHP > 8.1.0**
+- **PHP > 8.2.0**
 - **MySQL**
 
 ### 🚀 Setup dengan Makefile (Paling Gampang)
@@ -120,25 +98,9 @@ Bisa didownload di [sini](docs/surat.sql).
 ## 🔑 Login
 Gunakan akun berikut buat masuk:
 
-| Surel            | Kata Sandi |
+| Email            | Kata Sandi |
 |------------------|------------|
-| admin@admin.com | admin      |
+| admin@ksp.co.id | admin      |
 
 ## 🌍 Pengaturan Bahasa
 Aplikasi ini support Bahasa Indonesia & Inggris. Ubah `config/app.php` bagian `locale` jadi `id` atau `en`.
-
-## ⏰ Pengaturan Zona Waktu
-Ubah `timezone` di `config/app.php` sesuai kebutuhan. Lihat daftar zona waktu di sini: [PHP Timezones](https://www.php.net/manual/en/timezones.php).
-
-## 📸 Screenshot
-
-![Screenshot](docs/laravel-surat-menyurat-v1.png)
-
-## 🎥 Demo
-Tonton demo proyek ini di [YouTube](https://www.youtube.com/watch?v=dyatVEGavxo).
-
-## 🎨 Template
-Proyek ini pakai template admin [Sneat](https://github.com/themeselection/sneat-html-admin-template-free).
-
-## 📜 Lisensi
-Berlisensi di bawah [MIT License](LICENSE).

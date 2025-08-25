@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 
 /*
@@ -49,8 +50,13 @@ Route::middleware(['auth'])->group(function () {
     // Rute laporan absensi
     Route::get('/attendance/report', [AttendanceController::class, 'report'])->name('attendance.report');
     Route::get('/attendance/export-excel', [AttendanceController::class, 'exportExcel'])->name('attendance.export-excel');
+    Route::get('/attendance/export-pdf', [AttendanceController::class, 'exportPDF'])->name('attendance.export-pdf');
     
     // Rute resource untuk absensi
     Route::resource('attendance', AttendanceController::class);
+    
+    // Routes untuk Profile
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
 

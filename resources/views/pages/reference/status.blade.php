@@ -19,7 +19,7 @@
             class="btn btn-primary"
             data-bs-toggle="modal"
             data-bs-target="#createModal">
-            {{ __('menu.general.create') }}
+            Create
         </button>
     </x-breadcrumb>
 
@@ -30,7 +30,7 @@
                 <tr>
                     <th>#</th>
                     <th>{{ __('model.status.status') }}</th>
-                    <th>{{ __('menu.general.action') }}</th>
+                    <th>Action</th>
                 </tr>
                 </thead>
                 @if($data)
@@ -45,13 +45,13 @@
                                         data-status="{{ $status->status }}"
                                         data-bs-toggle="modal"
                                         data-bs-target="#editModal">
-                                    {{ __('menu.general.edit') }}
+                                    Edit
                                 </button>
                                 <form action="{{ route('reference.status.destroy', $status) }}" class="d-inline" method="post">
                                     @csrf
                                     @method('DELETE')
                                     <button class="btn btn-danger btn-sm btn-delete"
-                                            type="button">{{ __('menu.general.delete') }}</button>
+                                            type="button">Delete</button>
                                 </form>
                             </td>
                         </tr>
@@ -61,7 +61,7 @@
                     <tbody>
                     <tr>
                         <td colspan="4" class="text-center">
-                            {{ __('menu.general.empty') }}
+                            No data available
                         </td>
                     </tr>
                     </tbody>
@@ -70,7 +70,7 @@
                 <tr>
                     <th>#</th>
                     <th>{{ __('model.status.status') }}</th>
-                    <th>{{ __('menu.general.action') }}</th>
+                    <th>Action</th>
                 </tr>
                 </tfoot>
             </table>
@@ -85,7 +85,7 @@
             <form class="modal-content" method="post" action="{{ route('reference.status.store') }}">
                 @csrf
                 <div class="modal-header">
-                    <h5 class="modal-title" id="createModalTitle">{{ __('menu.general.create') }}</h5>
+                    <h5 class="modal-title" id="createModalTitle">Create</h5>
                     <button
                         type="button"
                         class="btn-close"
@@ -98,9 +98,9 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                        {{ __('menu.general.cancel') }}
+                        Cancel
                     </button>
-                    <button type="submit" class="btn btn-primary">{{ __('menu.general.save') }}</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
                 </div>
             </form>
         </div>
@@ -113,7 +113,7 @@
                 @csrf
                 @method('PUT')
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editModalTitle">{{ __('menu.general.edit') }}</h5>
+                    <h5 class="modal-title" id="editModalTitle">Edit</h5>
                     <button
                         type="button"
                         class="btn-close"
@@ -127,9 +127,9 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                        {{ __('menu.general.cancel') }}
+                        Cancel
                     </button>
-                    <button type="submit" class="btn btn-primary">{{ __('menu.general.save') }}</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
                 </div>
             </form>
         </div>

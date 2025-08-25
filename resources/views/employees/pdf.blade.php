@@ -33,10 +33,10 @@
         }
         th {
             background-color: #f2f2f2;
-            text-align: center;   /* <-- tambahkan ini */
+            text-align: center;  
         }
         td {
-            text-align: left;     /* <-- supaya isi data tetap kiri */
+            text-align: left;
         }
         .page-break {
             page-break-after: always;

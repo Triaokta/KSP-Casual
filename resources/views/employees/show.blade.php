@@ -43,7 +43,6 @@
                 </div>
             </div>
             
-            <!-- Riwayat Status Section -->
             <div class="row mt-4">
                 <div class="col-12">
                     <h5 class="mb-3">Riwayat Status</h5>

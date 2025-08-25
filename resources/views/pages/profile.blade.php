@@ -1,30 +1,59 @@
 @extends('layout.main')
 
 @push('script')
-<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
 <script>
     $('input#accountActivation').on('change', function () {
         $('button.deactivate-account').attr('disabled', !$(this).is(':checked'));
     });
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const signaturePad = new SignaturePad(document.getElementById('signature-pad'));
-        const parafPad = new SignaturePad(document.getElementById('paraf-pad'));
-
-        document.getElementById('clear-signature').onclick = () => signaturePad.clear();
-        document.getElementById('clear-paraf').onclick = () => parafPad.clear();
-
-        window.saveSignature = function () {
-            if (!signaturePad.isEmpty()) {
-                document.getElementById('signature_data').value = signaturePad.toDataURL('image/png');
-            }
-        };
-
-        window.saveParaf = function () {
-            if (!parafPad.isEmpty()) {
-                document.getElementById('paraf_data').value = parafPad.toDataURL('image/png');
-            }
-        };
+    
+    // Reset image
+    $('.account-image-reset').on('click', function() {
+        $('#uploadedAvatar').attr('src', 'https://ui-avatars.com/api/?background=6D67E4&color=fff&name={{ urlencode($data->name) }}');
+        // Buat input hidden untuk menandai bahwa avatar harus direset
+        if ($('input[name="reset_avatar"]').length === 0) {
+            $('<input>').attr({
+                type: 'hidden',
+                name: 'reset_avatar',
+                value: '1'
+            }).appendTo('form');
+        }
+    });
+    
+    // Preview image before upload
+    $('#upload').on('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                $('#uploadedAvatar').attr('src', e.target.result);
+            };
+            reader.readAsDataURL(file);
+            // Hapus input reset_avatar jika ada
+            $('input[name="reset_avatar"]').remove();
+        }
+    });
+    
+    // Toggle password visibility
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggles = document.querySelectorAll('.toggle-password');
+        toggles.forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const passwordInput = document.getElementById(targetId);
+                
+                // Toggle type attribute
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                // Toggle icon
+                const icon = this.querySelector('i');
+                if (type === 'password') {
+                    icon.className = 'bx bx-hide';
+                } else {
+                    icon.className = 'bx bx-show';
+                }
+            });
+        });
     });
 </script>
 @endpush
@@ -55,14 +84,14 @@
                             class="d-block rounded" height="100" width="100" id="uploadedAvatar">
                         <div class="button-wrapper">
                             <label for="upload" class="btn btn-primary me-2 mb-4" tabindex="0">
-                                <span class="d-none d-sm-block">{{ __('menu.general.upload') }}</span>
+                                <span class="d-none d-sm-block">Unggah Foto</span>
                                 <i class="bx bx-upload d-block d-sm-none"></i>
                                 <input type="file" name="profile_picture" id="upload" class="account-file-input" hidden=""
                                     accept="image/png, image/jpeg">
                             </label>
                             <button type="button" class="btn btn-outline-secondary account-image-reset mb-4">
                                 <i class="bx bx-reset d-block d-sm-none"></i>
-                                <span class="d-none d-sm-block">{{ __('menu.general.cancel') }}</span>
+                                <span class="d-none d-sm-block">Hapus Foto</span>
                             </button>
                             <p class="text-muted mb-0">< 800K (JPG, GIF, PNG)</p>
                         </div>
@@ -75,40 +104,61 @@
                         <div class="col-md-6 col-lg-12">
                             <x-input-form name="name" :label="__('model.user.name')" :value="$data->name" />
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 col-lg-12">
                             <x-input-form name="email" :label="__('model.user.email')" :value="$data->email" />
                         </div>
-                        <div class="col-md-6">
-                            <x-input-form name="phone" :label="__('model.user.phone')" :value="$data->phone ?? ''" />
+                    </div>
+                    
+                    <h5 class="fw-semibold mt-4 mb-3">Ubah Password</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="current_password" class="form-label">Password Saat Ini</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="current_password" name="current_password">
+                                    <span class="input-group-text toggle-password" data-target="current_password">
+                                        <i class="bx bx-hide"></i>
+                                    </span>
+                                </div>
+                                @error('current_password')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
                         </div>
-
-                        {{-- Signature & Paraf Buttons --}}
-                        <div class="col-md-6">
-                            <label class="form-label d-block">Tanda Tangan</label>
-                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#signatureModal">
-                                Tambah Tanda Tangan
-                            </button>
-                            @if ($data->signatureParaf && $data->signatureParaf->signature_path)
-                            <p class="mt-2">
-                                Sudah ada: <a href="{{ asset($data->signatureParaf->signature_path) }}" target="_blank">Lihat</a>
-                            </p>
-                            @endif
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="new_password" class="form-label">Password Baru</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="new_password" name="new_password">
+                                    <span class="input-group-text toggle-password" data-target="new_password">
+                                        <i class="bx bx-hide"></i>
+                                    </span>
+                                </div>
+                                @error('new_password')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label d-block">Paraf</label>
-                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#parafModal">
-                                Tambah Paraf
-                            </button>
-                            @if ($data->signatureParaf && $data->signatureParaf->paraf_path)
-                            <p class="mt-2">
-                                Sudah ada: <a href="{{ asset($data->signatureParaf->paraf_path) }}" target="_blank">Lihat</a>
-                            </p>
-                            @endif
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="new_password_confirmation" class="form-label">Konfirmasi Password Baru</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="new_password_confirmation" name="new_password_confirmation">
+                                    <span class="input-group-text toggle-password" data-target="new_password_confirmation">
+                                        <i class="bx bx-hide"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <small class="text-muted">
+                                Kosongkan field password jika tidak ingin mengubahnya. Jika diisi, password harus minimal 8 karakter, mengandung huruf besar, huruf kecil, dan angka.
+                            </small>
                         </div>
                     </div>
-                    <div class="mt-2">
-                        <button type="submit" class="btn btn-primary me-2">{{ __('menu.general.update') }}</button>
-                        <button type="reset" class="btn btn-outline-secondary">{{ __('menu.general.cancel') }}</button>
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary me-2">Simpan</button>
+                        <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary">Kembali</a>
                     </div>
                 </div>
             </form>
@@ -138,49 +188,4 @@
     </div>
 </div>
 
-{{-- Signature Modal --}}
-<div class="modal fade" id="signatureModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <form method="POST" action="{{ route('profile.upload.signature') }}">
-                @csrf
-                <div class="modal-header">
-                    <h5 class="modal-title">Tanda Tangan</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <canvas id="signature-pad" style="border:1px solid #ddd;" width="400" height="200"></canvas>
-                    <input type="hidden" name="signature_data" id="signature_data">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" id="clear-signature">Clear</button>
-                    <button type="submit" class="btn btn-primary" onclick="saveSignature()">Simpan</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-{{-- Paraf Modal --}}
-<div class="modal fade" id="parafModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <form method="POST" action="{{ route('profile.upload.paraf') }}">
-                @csrf
-                <div class="modal-header">
-                    <h5 class="modal-title">Paraf</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <canvas id="paraf-pad" style="border:1px solid #ddd;" width="400" height="200"></canvas>
-                    <input type="hidden" name="paraf_data" id="paraf_data">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" id="clear-paraf">Clear</button>
-                    <button type="submit" class="btn btn-primary" onclick="saveParaf()">Simpan</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 @endsection

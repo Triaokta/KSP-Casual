@@ -10,9 +10,7 @@
     </div>
 
     <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-        <!-- Search -->
         <form action="{{ route('employees.index') }}" method="GET" class="d-flex w-100 gap-2 align-items-center">
-        {{-- Input Pencarian --}}
         <div class="input-group">
             <span class="input-group-text border-0 bg-white">
                 <i class="bx bx-search fs-4 lh-0"></i>
@@ -27,7 +25,6 @@
             />
         </div>
 
-        {{-- Dropdown Departemen --}}
         <select
             name="department_id"
             class="form-select border-0 shadow-none"

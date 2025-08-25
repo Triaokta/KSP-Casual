@@ -8,6 +8,7 @@ use App\Exports\AttendanceExport;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class AttendanceController extends Controller
 {
@@ -49,10 +50,22 @@ class AttendanceController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function create()
+    public function create(Request $request)
     {
-        $employees = Employee::where('is_active', 1)->orderBy('name')->get();
-        $today = Carbon::today()->format('Y-m-d');
+        // Gunakan tanggal dari request atau default ke hari ini
+        $date = $request->input('date', Carbon::today()->format('Y-m-d'));
+        $today = $date;
+        
+        // Ambil daftar ID karyawan yang sudah absen pada tanggal tersebut
+        $attendedEmployeeIds = Attendance::where('date', $date)
+            ->pluck('employee_id')
+            ->toArray();
+            
+        // Filter karyawan yang belum absen pada tanggal tersebut
+        $employees = Employee::where('is_active', 1)
+            ->whereNotIn('id', $attendedEmployeeIds)
+            ->orderBy('name')
+            ->get();
         
         return view('attendance.create', compact('employees', 'today'));
     }
@@ -65,14 +78,24 @@ class AttendanceController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        // Tentukan aturan validasi berdasarkan status
+        $rules = [
             'employee_id' => 'required|exists:employees,id',
             'date' => 'required|date',
-            'time_in' => 'required|date_format:H:i',
-            'time_out' => 'nullable|date_format:H:i|after:time_in',
             'status' => 'required|in:hadir,izin,sakit,cuti,tanpa_keterangan',
             'notes' => 'nullable|string|max:255',
-        ]);
+        ];
+        
+        // Jika status hadir, jam masuk wajib diisi
+        if ($request->status === 'hadir') {
+            $rules['time_in'] = 'required|date_format:H:i';
+            $rules['time_out'] = 'nullable|date_format:H:i|after:time_in';
+        } else {
+            $rules['time_in'] = 'nullable|date_format:H:i';
+            $rules['time_out'] = 'nullable|date_format:H:i|after:time_in';
+        }
+        
+        $validated = $request->validate($rules);
         
         // Cek apakah data absensi sudah ada untuk karyawan dan tanggal yang sama
         $existingAttendance = Attendance::where('employee_id', $validated['employee_id'])
@@ -129,14 +152,24 @@ class AttendanceController extends Controller
     {
         $attendance = Attendance::findOrFail($id);
         
-        $validated = $request->validate([
+        // Tentukan aturan validasi berdasarkan status
+        $rules = [
             'employee_id' => 'required|exists:employees,id',
             'date' => 'required|date',
-            'time_in' => 'required|date_format:H:i',
-            'time_out' => 'nullable|date_format:H:i|after:time_in',
             'status' => 'required|in:hadir,izin,sakit,cuti,tanpa_keterangan',
             'notes' => 'nullable|string|max:255',
-        ]);
+        ];
+        
+        // Jika status hadir, jam masuk wajib diisi
+        if ($request->status === 'hadir') {
+            $rules['time_in'] = 'required|date_format:H:i';
+            $rules['time_out'] = 'nullable|date_format:H:i|after:time_in';
+        } else {
+            $rules['time_in'] = 'nullable|date_format:H:i';
+            $rules['time_out'] = 'nullable|date_format:H:i|after:time_in';
+        }
+        
+        $validated = $request->validate($rules);
         
         // Cek jika ada perubahan karyawan atau tanggal, pastikan tidak duplikat
         if ($validated['employee_id'] != $attendance->employee_id || $validated['date'] != $attendance->date) {
@@ -240,6 +273,72 @@ class AttendanceController extends Controller
             // Jika ada error, log dan beri tahu user
             \Log::error('Excel Export Error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Terjadi kesalahan saat mengekspor data. Silakan coba lagi.');
+        }
+    }
+
+    /**
+     * Export laporan absensi ke PDF.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
+     */
+    public function exportPDF(Request $request)
+    {
+        try {
+            $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
+            $endDate = $request->input('end_date', Carbon::now()->format('Y-m-d'));
+            $employeeId = $request->input('employee_id');
+            
+            // Query data attendance
+            $query = Attendance::query()->with('employee');
+            
+            if ($request->filled('employee_id')) {
+                $query->where('employee_id', $employeeId);
+            }
+            
+            $query->whereBetween('date', [$startDate, $endDate]);
+            
+            $attendances = $query->orderBy('date', 'desc')->get();
+            
+            // Hitung statistik
+            $summary = [
+                'total' => $attendances->count(),
+                'hadir' => $attendances->where('status', 'hadir')->count(),
+                'izin' => $attendances->where('status', 'izin')->count(),
+                'sakit' => $attendances->where('status', 'sakit')->count(),
+                'cuti' => $attendances->where('status', 'cuti')->count(),
+                'tanpa_keterangan' => $attendances->where('status', 'tanpa_keterangan')->count(),
+            ];
+            
+            // Format tanggal untuk nama file (dd-mm-yyyy)
+            $startFormatted = date('d-m-Y', strtotime($startDate));
+            $endFormatted = date('d-m-Y', strtotime($endDate));
+            
+            // Judul laporan
+            $title = 'Laporan Absensi';
+            $periodText = "Periode: $startFormatted s/d $endFormatted";
+            
+            if ($employeeId) {
+                $employee = Employee::findOrFail($employeeId);
+                $employeeText = "Karyawan: " . $employee->name;
+                $fileName = 'Absensi_' . $employee->name . '_' . $startFormatted . '_sampai_' . $endFormatted . '.pdf';
+            } else {
+                $employeeText = "Karyawan: Semua Karyawan";
+                $fileName = 'Absensi_' . $startFormatted . '_sampai_' . $endFormatted . '.pdf';
+            }
+            
+            // Load data ke view PDF
+            $pdf = PDF::loadView('attendance.pdf', compact('attendances', 'summary', 'title', 'periodText', 'employeeText'));
+            
+            // Set paper A4 dan orientasi landscape
+            $pdf->setPaper('a4', 'landscape');
+            
+            // Download PDF
+            return $pdf->download($fileName);
+        } catch (\Exception $e) {
+            // Jika ada error, log dan beri tahu user
+            \Log::error('PDF Export Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat mengekspor PDF. Silakan coba lagi.');
         }
     }
 }

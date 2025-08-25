@@ -29,7 +29,6 @@
                 </div>
                 
                 <div class="card-body">
-                    <!-- Filter Form -->
                     <form action="{{ route('attendance.index') }}" method="GET" class="mb-4">
                         <div class="row g-3">
                             <div class="col-md-3">
@@ -64,7 +63,6 @@
                         </div>
                     </form>
                     
-                    <!-- Table -->
                     <div class="table-responsive">
                         <table class="table table-bordered table-hover">
                             <thead>
@@ -85,8 +83,8 @@
                                             <td>{{ $attendance->date->format('d/m/Y') }}</td>
                                             <td>{{ $attendance->employee->employee_id }}</td>
                                             <td>{{ $attendance->employee->name }}</td>
-                                            <td>{{ $attendance->time_in }}</td>
-                                            <td>{{ $attendance->time_out ?? '-' }}</td>
+                                            <td>{{ $attendance->time_in_formatted }}</td>
+                                            <td>{{ $attendance->time_out_formatted }}</td>
                                             <td>
                                                 @php
                                                     $statusColors = [
@@ -97,9 +95,17 @@
                                                         'tanpa_keterangan' => 'danger'
                                                     ];
                                                     $color = $statusColors[$attendance->status] ?? 'secondary';
+                                                    
+                                                    // Format status untuk tampilan yang lebih baik
+                                                    $statusText = $attendance->status;
+                                                    if ($statusText == 'tanpa_keterangan') {
+                                                        $statusText = 'Tanpa Keterangan';
+                                                    } else {
+                                                        $statusText = ucfirst($statusText);
+                                                    }
                                                 @endphp
                                                 <span class="badge bg-{{ $color }}">
-                                                    {{ ucfirst($attendance->status) }}
+                                                    {{ $statusText }}
                                                 </span>
                                             </td>
                                             <td>
@@ -130,7 +136,6 @@
                         </table>
                     </div>
                     
-                    <!-- Pagination -->
                     <div class="mt-4">
                         {{ $attendances->withQueryString()->links() }}
                     </div>

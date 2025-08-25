@@ -1,13 +1,9 @@
-{{-- File: resources/views/employees/_form.blade.php --}}
-
-{{-- Tampilkan pesan error khusus jika data sudah ada --}}
 @if (session('error'))
     <div class="alert alert-danger">
         <strong>Peringatan:</strong> {!! session('error') !!}
     </div>
 @endif
 
-{{-- Tampilkan error validasi jika ada --}}
 @if ($errors->any())
     <div class="alert alert-danger">
         <strong>Oops! Terjadi kesalahan:</strong>
@@ -53,12 +49,10 @@
 <div class="mb-3">
     <label for="no_rek" class="form-label">Nomor Rekening & Bank</label>
     <div class="d-flex gap-2">
-        {{-- Nomor rekening --}}
         <input type="text" class="form-control" id="no_rek" name="no_rek"
             value="{{ old('no_rek', $employee->no_rek ?? '') }}"
             placeholder="Nomor Rekening" style="flex:1">
 
-        {{-- Dropdown bank --}}
         <select class="form-select select2" id="bank_id" name="bank_id" style="flex:1">
             <option value="">Pilih Bank...</option>
             @foreach($banks as $bank)
@@ -69,7 +63,6 @@
             @endforeach
         </select>
 
-        {{-- Input manual jika tidak ada --}}
         <input type="text" class="form-control" id="nama_bank" 
             name="nama_bank" placeholder="Isi manual jika bank tidak ada"
             value="{{ old('nama_bank', $employee->nama_bank ?? '') }}" style="flex:1">
