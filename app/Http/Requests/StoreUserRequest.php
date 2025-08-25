@@ -47,7 +47,6 @@ class StoreUserRequest extends FormRequest
             'superior_registration_id' => ['nullable', 'string'],
             'nik' => ['nullable', 'string'],
             'address' => ['nullable', 'string'],
-            'is_active' => ['nullable'],
             'role' => ['required', Rule::in(array_column(Role::cases(), 'value'))],
         ];
     }

@@ -11,13 +11,9 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up(): void
+    public function up()
     {
-        Schema::create('letter_statuses', function (Blueprint $table) {
-            $table->id();
-            $table->string('status');
-            $table->timestamps();
-        });
+        // Migrasi sudah dijalankan secara terpisah
     }
 
     /**
@@ -25,8 +21,8 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down(): void
+    public function down()
     {
-        Schema::dropIfExists('letter_statuses');
+        // Migrasi sudah dijalankan secara terpisah
     }
 };

@@ -14,6 +14,8 @@ use Maatwebsite\Excel\Concerns\SkipsErrors;
 use Maatwebsite\Excel\Concerns\SkipsOnError;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Events\AfterImport;
 
 class ImportKaryawan implements 
     ToModel,
@@ -22,13 +24,69 @@ class ImportKaryawan implements
     SkipsOnFailure,
     SkipsOnError,
     WithBatchInserts,
-    WithChunkReading
+    WithChunkReading,
+    WithEvents
 {
     use SkipsFailures, SkipsErrors;
 
+    // Simpan data duplikat yang ditemukan selama proses import
+    protected $duplicates = [];
+    
+    // Simpan jumlah baris yang diproses
+    protected $rowCount = 0;
+    
     public function model(array $row)
     {
         try {
+            // Pastikan baris memiliki data yang valid
+            if (empty($row['id_karyawan']) || empty($row['nama_lengkap']) || empty($row['no_ktp'])) {
+                Log::warning('⚠️ Baris dengan data tidak lengkap dilewati: ' . json_encode($row));
+                return null;
+            }
+            
+            // Increment row count hanya untuk baris data yang valid
+            $this->rowCount++;
+            
+            // Cek apakah data sudah ada sebelum simpan
+            $existingEmployee = Employee::where('employee_id', $row['id_karyawan'])
+                ->orWhere('nik_ktp', $row['no_ktp'])
+                ->first();
+                
+            // Jika NPWP diisi, tambahkan pengecekan
+            if (!empty($row['npwp'])) {
+                $existingByNpwp = Employee::where('npwp', $row['npwp'])->first();
+                if ($existingByNpwp) {
+                    $existingEmployee = $existingByNpwp;
+                }
+            }
+            
+            // Jika data sudah ada, tambahkan ke daftar duplikat dan skip
+            if ($existingEmployee) {
+                $reason = [];
+                
+                if ($existingEmployee->employee_id == $row['id_karyawan']) {
+                    $reason[] = 'ID Karyawan sudah digunakan';
+                }
+                if ($existingEmployee->nik_ktp == $row['no_ktp']) {
+                    $reason[] = 'NIK sudah digunakan';
+                }
+                if (!empty($row['npwp']) && $existingEmployee->npwp == $row['npwp']) {
+                    $reason[] = 'NPWP sudah digunakan';
+                }
+                
+                $this->duplicates[] = [
+                    'row' => $row,
+                    'reason' => implode(', ', $reason)
+                ];
+                
+                Log::warning('⚠️ Data duplikat ditemukan: ' . json_encode([
+                    'data' => $row,
+                    'reason' => implode(', ', $reason)
+                ]));
+                
+                return null;
+            }
+            
             // Buat atau cari departemen
             $department = Department::updateOrCreate(
                 ['name' => $row['departemen']],
@@ -39,12 +97,13 @@ class ImportKaryawan implements
 
             // Return employee untuk disimpan otomatis oleh Laravel Excel
             return new Employee([
-                'employee_id'     => $row['nomor_karyawan'],
+                'employee_id'     => $row['id_karyawan'],
                 'name'            => $row['nama_lengkap'],
                 'nik_ktp'         => $row['no_ktp'],
                 'address'         => $row['alamat'],
                 'npwp'            => $row['npwp'],
-                'no_kk'           => $row['no_kk'],
+                'no_rek'          => $row['no_rek'] ?? null,
+                'nama_bank'       => $row['nama_bank'] ?? null,
                 'department_id'   => $department->id,
                 'is_active'       => strtolower(trim($row['status_aktif'])) === 'aktif',
             ]);
@@ -54,15 +113,29 @@ class ImportKaryawan implements
             return null;
         }
     }
+    
+    // Getter untuk data duplikat
+    public function getDuplicates()
+    {
+        return $this->duplicates;
+    }
+    
+    // Method untuk menghitung jumlah baris
+    public function getRowCount()
+    {
+        return $this->rowCount;
+    }
 
     public function rules(): array
     {
         return [
-            'nomor_karyawan' => 'required|string|unique:employees,employee_id',
+            'id_karyawan' => 'required|string',
             'nama_lengkap'   => 'required|string',
-            'no_ktp'         => 'required|string|size:16|unique:employees,nik_ktp',
+            'no_ktp'         => 'required|string|size:16',
             'departemen'     => 'required|string',
             'status_aktif'   => 'required|in:Aktif,Nonaktif',
+            'no_rek'         => 'nullable|string',
+            'nama_bank'      => 'nullable|string',
         ];
     }
 
@@ -74,5 +147,19 @@ class ImportKaryawan implements
     public function chunkSize(): int
     {
         return 100;
+    }
+    
+    /**
+     * Register events
+     */
+    public function registerEvents(): array
+    {
+        return [
+            // After import has finished
+            AfterImport::class => function(AfterImport $event) {
+                \Log::info('Import selesai. Total baris diproses: ' . $this->rowCount);
+                \Log::info('Total data duplikat: ' . count($this->duplicates));
+            },
+        ];
     }
 }

@@ -100,7 +100,7 @@
             @if (!in_array(Route::currentRouteName(), ['dashboard', 'import.karyawan.form']))
                 <!-- Navbar -->
             @php
-                $hideNavbarOn = ['dashboard', 'import.karyawan.form', 'employees.create'];
+                $hideNavbarOn = ['dashboard', 'import.karyawan.form', 'employees.create', 'employees.show','attendance.report', 'attendance.show', 'attendance.index', 'attendance.edit', 'attendance.create'];
             @endphp
 
             @if (!in_array(Route::currentRouteName(), $hideNavbarOn))

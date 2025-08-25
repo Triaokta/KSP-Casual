@@ -5,28 +5,40 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Employee;
+use App\Models\Department;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Data dummy untuk testing, nanti bisa diambil dari database
-        $todayLetterTransaction = 12;
-        $activeEmployees = Employee::where('is_active', 1)->count();
-        $inactiveEmployees = Employee::where('is_active', 0)->count();
-        $todayOutgoingLetter = 4;
+        // Dapatkan department_id dari query parameter atau null jika tidak ada
+        $departmentId = $request->input('department_id');
+        
+        // Ambil semua departemen untuk dropdown
+        $departments = Department::orderBy('name')->get();
+        
+        // Buat query dasar
+        $query = Employee::query();
+        
+        // Filter berdasarkan departemen jika parameter ada
+        if ($departmentId) {
+            $query->where('department_id', $departmentId);
+        }
+        
+        // Hitung total karyawan
+        $totalEmployees = $query->count();
+        
+        // Hitung karyawan aktif
+        $activeEmployees = (clone $query)->where('is_active', 1)->count();
+        
+        // Hitung karyawan non-aktif
+        $inactiveEmployees = (clone $query)->where('is_active', 0)->count();
 
-        $totalYesterday = 10; // nilai acuan untuk menghitung persen
-
-        $percentageLetterTransaction = $totalYesterday > 0
-            ? round((($todayLetterTransaction - $totalYesterday) / $totalYesterday) * 100, 2)
-            : 0;
-
-        $percentageIncomingLetter = 20;
-        $percentageOutgoingLetter = -10;
-        $percentageDispositionLetter = 5;
-
-        $totalEmployees = Employee::count();
+        // Ambil nama departemen yang dipilih jika ada
+        $selectedDepartmentName = null;
+        if ($departmentId) {
+            $selectedDepartmentName = Department::find($departmentId)->name ?? 'Semua Departemen';
+        }
 
         return view('pages.dashboard', [
             'greeting' => 'Selamat Datang!',
@@ -34,7 +46,9 @@ class DashboardController extends Controller
             'activeEmployees' => $activeEmployees,
             'inactiveEmployees' => $inactiveEmployees,
             'totalEmployees' => $totalEmployees,
-
+            'departments' => $departments,
+            'selectedDepartmentId' => $departmentId,
+            'selectedDepartmentName' => $selectedDepartmentName,
         ]);
     }
 }

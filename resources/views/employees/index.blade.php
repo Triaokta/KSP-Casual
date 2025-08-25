@@ -10,21 +10,39 @@
         </div>
     @endif
 
+    @if (session('warning'))
+        <div class="alert alert-warning" role="alert">
+            {!! session('warning') !!}
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-danger" role="alert">
+            {!! session('error') !!}
+        </div>
+    @endif
+
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
-            {{-- Hanya ada satu tombol Tambah Karyawan di sini --}}
-            <a href="{{ route('employees.create') }}" class="btn btn-primary">Tambah Karyawan Baru</a>
-            
-            {{-- Tombol untuk Export Excel --}}
-            <a href="{{ route('employees.export') }}" class="btn btn-success">
-                <i class="bx bx-upload me-1"></i> Export Excel
-            </a>
+            <div>
+                <a href="{{ route('employees.create') }}" class="btn btn-primary">Tambah Karyawan Baru</a>
+            </div>
+            <div>
+                {{-- Tombol untuk Export Excel --}}
+                <a href="{{ route('employees.export') }}" class="btn btn-success me-2">
+                    <i class="bx bx-upload me-1"></i> Export Excel
+                </a>
+                {{-- Tombol untuk Export PDF --}}
+                <a href="{{ route('employees.export.pdf') }}" class="btn btn-warning">
+                    <i class="bx bxs-file-pdf me-1"></i> Export PDF
+                </a>
+            </div>
         </div>
         <div class="table-responsive text-nowrap">
             <table class="table">
                 <thead>
                     <tr>
-                        <th>NOMOR INDUK KARYAWAN</th>
+                        <th>ID KARYAWAN</th>
                         <th>NAMA</th>
                         <th>DEPARTEMEN/DIVISI</th>
                         <th>STATUS</th>

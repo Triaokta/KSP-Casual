@@ -31,8 +31,16 @@
         <!-- Import -->
         <li class="menu-item {{ request()->routeIs('import.karyawan.form') ? 'active' : '' }}">
             <a href="{{ route('import.karyawan.form') }}" class="menu-link">
-                <i class="menu-icon tf-icons bx bx-upload"></i>
+                <i class="menu-icon tf-icons bx bx-download"></i>
                 <div>Import Karyawan</div>
+            </a>
+        </li>
+
+        <!-- Absensi -->
+        <li class="menu-item {{ request()->routeIs('attendance.*') ? 'active' : '' }}">
+            <a href="{{ route('attendance.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bx-calendar-check"></i>
+                <div>Absensi</div>
             </a>
         </li>
     </ul>

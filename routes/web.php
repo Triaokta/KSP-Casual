@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 
 /*
@@ -33,6 +34,9 @@ Route::middleware(['auth'])->group(function () {
 
     // Rute untuk fitur Export Excel
     Route::get('/employees/export', [EmployeeController::class, 'export'])->name('employees.export');
+    
+    // Rute untuk fitur Export PDF
+    Route::get('/employees/export-pdf', [EmployeeController::class, 'exportPDF'])->name('employees.export.pdf');
 
     // Rute untuk mengubah status aktif/nonaktif
     Route::post('/employees/{employee}/toggle-status', [EmployeeController::class, 'toggleStatus'])->name('employees.toggle_status');
@@ -40,6 +44,13 @@ Route::middleware(['auth'])->group(function () {
     // Rute resource untuk semua fungsi CRUD standar (index, create, show, edit, dll.)
     // Diletakkan di paling bawah grup karyawan.
     Route::resource('employees', EmployeeController::class);
-
+    
+    // --- Rute untuk Absensi ---
+    // Rute laporan absensi
+    Route::get('/attendance/report', [AttendanceController::class, 'report'])->name('attendance.report');
+    Route::get('/attendance/export-excel', [AttendanceController::class, 'exportExcel'])->name('attendance.export-excel');
+    
+    // Rute resource untuk absensi
+    Route::resource('attendance', AttendanceController::class);
 });
 

@@ -9,8 +9,12 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\WithEvents;
-use Maatwebsite\Excel\Events\AfterSheet;
+use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use Maatwebsite\Excel\Events\AfterSheet;
 
 class EmployeesExport implements
     FromCollection,
@@ -18,47 +22,64 @@ class EmployeesExport implements
     WithMapping,
     ShouldAutoSize,
     WithColumnFormatting,
-    WithEvents
+    WithEvents,
+    WithCustomStartCell
 {
     public function collection()
     {
-        return Employee::with('department')->get();
+        return Employee::with(['department', 'bank'])
+            ->where('is_active', 1)
+            ->orderBy('employee_id')
+            ->get();
+    }
+
+    // Geser header agar mulai dari baris 2
+    public function startCell(): string
+    {
+        return 'A2';
     }
 
     public function headings(): array
     {
         return [
-            'NOMOR KARYAWAN',
+            'ID KARYAWAN',
             'NAMA LENGKAP',
-            'NO. KTP',
+            'NIK',
             'ALAMAT',
             'NPWP',
-            'NO. KK',
             'DEPARTEMEN',
-            'STATUS',
+            'NO. REKENING',
+            'BANK',
         ];
     }
 
     public function map($employee): array
     {
+        $bankName = '';
+        if ($employee->bank_id && $employee->bank) {
+            $bankName = $employee->bank->name;
+        } elseif ($employee->bank_name_manual) {
+            $bankName = $employee->bank_name_manual;
+        }
+
         return [
             $employee->employee_id,
             $employee->name,
             '="' . $employee->nik_ktp . '"',
             $employee->address,
             '="' . $employee->npwp . '"',
-            '="' . $employee->no_kk . '"',
             optional($employee->department)->name,
-            $employee->is_active ? 'Aktif' : 'Nonaktif',
+            '="' . $employee->no_rek . '"',
+            $bankName,
         ];
     }
 
     public function columnFormats(): array
     {
         return [
-            'C' => NumberFormat::FORMAT_TEXT, // NO KTP
-            'E' => NumberFormat::FORMAT_TEXT, // NPWP
-            'F' => NumberFormat::FORMAT_TEXT, // NO KK
+            'C' => NumberFormat::FORMAT_TEXT,
+            'E' => NumberFormat::FORMAT_TEXT,
+            'F' => NumberFormat::FORMAT_TEXT,
         ];
     }
 
@@ -66,10 +87,44 @@ class EmployeesExport implements
     {
         return [
             AfterSheet::class => function (AfterSheet $event) {
-                // Format kolom sebagai teks: dari baris 2 sampai 1000
-                foreach (['C', 'E', 'F'] as $column) {
-                    $event->sheet->getDelegate()->getStyle("{$column}2:{$column}1000")
-                        ->getNumberFormat()->setFormatCode('@');
+                $sheet = $event->sheet->getDelegate();
+
+                // Tambah judul di baris pertama
+                $sheet->mergeCells('A1:H1');
+                $sheet->setCellValue('A1', 'Data Karyawan Aktif Per Tanggal : ' . now()->format('d F Y'));
+
+                // Style judul
+                $sheet->getStyle('A1')->applyFromArray([
+                    'font' => ['bold' => true, 'size' => 14],
+                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                ]);
+
+                // Style header tabel (A2:H2)
+                $sheet->getStyle('A2:H2')->applyFromArray([
+                    'font' => ['bold' => true],
+                    'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                    'borders' => [
+                        'allBorders' => ['borderStyle' => Border::BORDER_THIN],
+                    ],
+                    'fill' => [
+                        'fillType' => Fill::FILL_SOLID,
+                        'color' => ['rgb' => 'D9D9D9'],
+                    ],
+                ]);
+
+                // Hitung jumlah baris data
+                $rowCount = Employee::where('is_active', 1)->count() + 2; // baris header di row 2
+
+                // Style border seluruh tabel
+                $sheet->getStyle("A2:H{$rowCount}")->applyFromArray([
+                    'borders' => [
+                        'allBorders' => ['borderStyle' => Border::BORDER_THIN],
+                    ],
+                ]);
+
+                // Auto width
+                foreach (range('A', 'H') as $col) {
+                    $sheet->getColumnDimension($col)->setAutoSize(true);
                 }
             },
         ];

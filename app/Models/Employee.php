@@ -21,7 +21,9 @@ class Employee extends Model
         'address',
         'nik_ktp',
         'npwp',
-        'no_kk',
+        'no_rek',
+        'bank_id',
+        'nama_bank',
         'department_id',
         'is_active',
     ];
@@ -33,5 +35,42 @@ class Employee extends Model
     public function department()
     {
         return $this->belongsTo(Department::class);
+    }
+
+    public function bank()
+    {
+        return $this->belongsTo(Bank::class);
+    }
+    
+    /**
+     * Get the status histories for the employee.
+     */
+    public function statusHistories()
+    {
+        return $this->hasMany(EmployeeStatusHistory::class);
+    }
+    
+    /**
+     * Hitung berapa kali status aktif berubah
+     */
+    public function getStatusChangeCountAttribute()
+    {
+        return $this->statusHistories()->count();
+    }
+    
+    /**
+     * Ambil riwayat perubahan status terakhir
+     */
+    public function getLastStatusChangeAttribute()
+    {
+        return $this->statusHistories()->latest()->first();
+    }
+    
+    /**
+     * Relasi dengan absensi
+     */
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
     }
 }

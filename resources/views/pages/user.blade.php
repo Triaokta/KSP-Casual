@@ -17,7 +17,7 @@
         $('#editModal input#jabatan_full').val($(this).data('jabatan_full'));
         $('#editModal select#department_id').val($(this).data('department_id'));
         $('#editModal select#directorate_id').val($(this).data('directorate_id'));
-        $('#editModal input#is_active').prop('checked', $(this).data('active') == 1);
+
     });
 </script>
 @endpush
@@ -101,7 +101,7 @@
                         <td>{{ $user->phone }}</td>
                         <td>
                             <span class="badge bg-label-primary me-1">
-                                {{ $user->is_active ? 'Aktif' : 'Nonaktif' }}
+                                Aktif
                             </span>
                         </td>
                         <td>
@@ -110,7 +110,7 @@
                                     data-name="{{ $user->name }}"
                                     data-email="{{ $user->email }}"
                                     data-phone="{{ $user->phone }}"
-                                    data-active="{{ $user->is_active }}"
+                                    data-active="1"
                                     data-registration_id="{{ $user->registration_id }}"
                                     data-nik="{{ $user->nik }}"
                                     data-address="{{ $user->address }}"
@@ -186,10 +186,7 @@
                     </select>
                 @endif
 
-                <div class="form-check mt-2">
-                    <input class="form-check-input" type="checkbox" name="is_active" value="true" id="is_active_create">
-                    <label class="form-check-label" for="is_active_create">Aktif</label>
-                </div>
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
@@ -232,10 +229,7 @@
                     </select>
                 @endif
 
-                <div class="form-check mt-2">
-                    <input class="form-check-input" type="checkbox" name="is_active" value="true" id="is_active">
-                    <label class="form-check-label" for="is_active">Aktif</label>
-                </div>
+
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" name="reset_password" value="true" id="reset_password">
                     <label class="form-check-label" for="reset_password">Reset Password</label>

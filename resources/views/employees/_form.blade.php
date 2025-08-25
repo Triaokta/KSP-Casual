@@ -1,5 +1,12 @@
 {{-- File: resources/views/employees/_form.blade.php --}}
 
+{{-- Tampilkan pesan error khusus jika data sudah ada --}}
+@if (session('error'))
+    <div class="alert alert-danger">
+        <strong>Peringatan:</strong> {!! session('error') !!}
+    </div>
+@endif
+
 {{-- Tampilkan error validasi jika ada --}}
 @if ($errors->any())
     <div class="alert alert-danger">
@@ -13,19 +20,19 @@
 @endif
 
 <div class="mb-3">
-    <label for="employee_id" class="form-label">Nomor Induk Karyawan</label>
+    <label for="employee_id" class="form-label">ID Karyawan</label>
     <input type="text" class="form-control" id="employee_id" name="employee_id"
         value="{{ old('employee_id', $employee->employee_id ?? '') }}" required>
 </div>
 
 <div class="mb-3">
-    <label for="name" class="form-label">Nama Lengkap</label>
+    <label for="name" class="form-label">Nama Lengkap Karyawan</label>
     <input type="text" class="form-control" id="name" name="name"
         value="{{ old('name', $employee->name ?? '') }}" required>
 </div>
 
 <div class="mb-3">
-    <label for="nik_ktp" class="form-label">No. KTP</label>
+    <label for="nik_ktp" class="form-label">NIK</label>
     <input type="text" class="form-control" id="nik_ktp" name="nik_ktp"
         value="{{ old('nik_ktp', $employee->nik_ktp ?? '') }}"
         maxlength="16" pattern="\d{16}" inputmode="numeric" required>
@@ -37,17 +44,36 @@
 </div>
 
 <div class="mb-3">
-    <label for="npwp" class="form-label">NPWP</label>
+    <label for="npwp" class="form-label">NPWP *</label>
     <input type="text" class="form-control" id="npwp" name="npwp"
         value="{{ old('npwp', $employee->npwp ?? '') }}"
         maxlength="16" pattern="\d{16}" inputmode="numeric">
 </div>
 
 <div class="mb-3">
-    <label for="no_kk" class="form-label">No. Kartu Keluarga</label>
-    <input type="text" class="form-control" id="no_kk" name="no_kk"
-        value="{{ old('no_kk', $employee->no_kk ?? '') }}"
-        maxlength="16" pattern="\d{16}" inputmode="numeric">
+    <label for="no_rek" class="form-label">Nomor Rekening & Bank</label>
+    <div class="d-flex gap-2">
+        {{-- Nomor rekening --}}
+        <input type="text" class="form-control" id="no_rek" name="no_rek"
+            value="{{ old('no_rek', $employee->no_rek ?? '') }}"
+            placeholder="Nomor Rekening" style="flex:1">
+
+        {{-- Dropdown bank --}}
+        <select class="form-select select2" id="bank_id" name="bank_id" style="flex:1">
+            <option value="">Pilih Bank...</option>
+            @foreach($banks as $bank)
+                <option value="{{ $bank->id }}" 
+                    {{ old('bank_id', $employee->bank_id ?? '') == $bank->id ? 'selected' : '' }}>
+                    {{ $bank->name }}
+                </option>
+            @endforeach
+        </select>
+
+        {{-- Input manual jika tidak ada --}}
+        <input type="text" class="form-control" id="nama_bank" 
+            name="nama_bank" placeholder="Isi manual jika bank tidak ada"
+            value="{{ old('nama_bank', $employee->nama_bank ?? '') }}" style="flex:1">
+    </div>
 </div>
 
 <div class="mb-3">

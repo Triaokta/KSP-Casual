@@ -62,7 +62,6 @@ class UserController extends Controller
         try {
             $newUser = $request->validated();
             $newUser['password'] = Hash::make(Config::getValueByCode(ConfigEnum::DEFAULT_PASSWORD));
-            $newUser['is_active'] = isset($newUser['is_active']);
 
             if ($request->filled('superior_registration_id')) {
                 $superior = User::where('registration_id', $request->superior_registration_id)->first();
@@ -93,7 +92,6 @@ class UserController extends Controller
     {
         try {
             $newUser = $request->validated();
-            $newUser['is_active'] = isset($newUser['is_active']);
 
             // Prevent role changes unless admin
             if (auth()->user()->role !== Role::ADMIN->value) {

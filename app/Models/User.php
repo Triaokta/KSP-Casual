@@ -24,7 +24,6 @@ class User extends Authenticatable
         'phone',
         'password',
         'role',
-        'is_active',
         'jabatan_id',
         'department_id',
         'division_id',         // Added
@@ -49,7 +48,6 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'is_active' => 'boolean',
     ];
 
     /**
@@ -118,11 +116,6 @@ class User extends Authenticatable
     }
 
     // Scopes
-    public function scopeActive($query)
-    {
-        return $query->where('is_active', true);
-    }
-
     public function scopeRole($query, Role $role)
     {
         return $query->where('role', $role->status());

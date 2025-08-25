@@ -25,7 +25,7 @@ class PageController extends Controller
         return view('pages.dashboard', [
             'greeting' => 'Selamat Datang!',
             'currentDate' => Carbon::now()->isoFormat('dddd, D MMMM YYYY'),
-            'activeUser' => User::active()->count(),
+            'activeUser' => User::count(),
             'totalEmployees' => Employee::count(),
             'activeEmployees' => Employee::where('is_active', 1)->count(),
             'inactiveEmployees' => Employee::where('is_active', 0)->count(),

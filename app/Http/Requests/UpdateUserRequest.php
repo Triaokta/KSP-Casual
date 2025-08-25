@@ -84,7 +84,6 @@ class UpdateUserRequest extends FormRequest
             'superior_registration_id' => ['nullable', 'exists:users,registration_id'],
             'nik' => ['nullable', 'string'],
             'address' => ['nullable', 'string'],
-            'is_active' => ['nullable'],
             'role' => ['required', Rule::in(array_column(Role::cases(), 'value'))],
         ];
     }

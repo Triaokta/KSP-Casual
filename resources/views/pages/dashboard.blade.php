@@ -29,13 +29,18 @@
         const chart = new ApexCharts(document.querySelector("#today-graphic"), options);
 
         chart.render();
+        
+        // Script untuk otomatis submit form saat departemen dipilih
+        document.getElementById('department_id').addEventListener('change', function() {
+            document.getElementById('departmentFilterForm').submit();
+        });
     </script>
 @endpush
 
 @section('content')
     <div class="row">
         <div class="col-lg-12 mb-4 order-0">
-            <div class="card mb-4">
+            <div class="card">
                 <div class="d-flex align-items-end row">
                     <div class="col-sm-7">
                         <div class="card-body">
@@ -55,6 +60,26 @@
                 </div>
             </div>
         </div>
+        
+        <div class="col-lg-12 mb-4">
+            <div class="card">
+                <form action="{{ route('dashboard') }}" method="GET" id="departmentFilterForm">
+                    <div class="row align-items-center">
+                        <div class="input-group">
+                            <select class="form-select" name="department_id" id="department_id">
+                                <option value="">Semua Departemen</option>
+                                @foreach($departments as $department)
+                                    <option value="{{ $department->id }}" {{ $selectedDepartmentId == $department->id ? 'selected' : '' }}>
+                                        {{ $department->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
         <div class="col-lg-12 order-1">
             <div class="row text-center">
                 <div class="col-md-4 col-12 mb-4">
