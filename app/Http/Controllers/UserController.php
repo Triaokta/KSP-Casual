@@ -31,7 +31,7 @@ class UserController extends Controller
             ->when($request->search, fn($q, $search) => $q->where('name', 'like', "%{$search}%"))
             ->when($request->jabatan_id, fn($q, $id) => $q->where('jabatan_id', $id))
             ->when($request->department_id, fn($q, $id) => $q->where('department_id', $id))
-            // Apply scoping based on role
+
             ->when(
                 $auth->role === Role::DEPARTMENT_ADMIN->value,
                 fn($q) => $q->where('department_id', $auth->department_id)

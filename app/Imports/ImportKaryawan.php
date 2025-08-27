@@ -38,21 +38,17 @@ class ImportKaryawan implements
     public function model(array $row)
     {
         try {
-            // Pastikan baris memiliki data yang valid
             if (empty($row['id_karyawan']) || empty($row['nama_lengkap']) || empty($row['no_ktp'])) {
                 Log::warning('⚠️ Baris dengan data tidak lengkap dilewati: ' . json_encode($row));
                 return null;
             }
             
-            // Increment row count hanya untuk baris data yang valid
             $this->rowCount++;
             
-            // Cek apakah data sudah ada sebelum simpan
             $existingEmployee = Employee::where('employee_id', $row['id_karyawan'])
                 ->orWhere('nik_ktp', $row['no_ktp'])
                 ->first();
                 
-            // Jika NPWP diisi, tambahkan pengecekan
             if (!empty($row['npwp'])) {
                 $existingByNpwp = Employee::where('npwp', $row['npwp'])->first();
                 if ($existingByNpwp) {
@@ -60,7 +56,6 @@ class ImportKaryawan implements
                 }
             }
             
-            // Jika data sudah ada, tambahkan ke daftar duplikat dan skip
             if ($existingEmployee) {
                 $reason = [];
                 
@@ -87,7 +82,6 @@ class ImportKaryawan implements
                 return null;
             }
             
-            // Buat atau cari departemen
             $department = Department::updateOrCreate(
                 ['name' => $row['departemen']],
                 ['directorate_id' => 1]
@@ -95,7 +89,6 @@ class ImportKaryawan implements
 
             Log::info('📥 Import baris:', $row);
 
-            // Return employee untuk disimpan otomatis oleh Laravel Excel
             return new Employee([
                 'employee_id'     => $row['id_karyawan'],
                 'name'            => $row['nama_lengkap'],
@@ -114,13 +107,11 @@ class ImportKaryawan implements
         }
     }
     
-    // Getter untuk data duplikat
     public function getDuplicates()
     {
         return $this->duplicates;
     }
     
-    // Method untuk menghitung jumlah baris
     public function getRowCount()
     {
         return $this->rowCount;
@@ -149,13 +140,10 @@ class ImportKaryawan implements
         return 100;
     }
     
-    /**
-     * Register events
-     */
+
     public function registerEvents(): array
     {
         return [
-            // After import has finished
             AfterImport::class => function(AfterImport $event) {
                 \Log::info('Import selesai. Total baris diproses: ' . $this->rowCount);
                 \Log::info('Total data duplikat: ' . count($this->duplicates));

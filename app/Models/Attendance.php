@@ -32,25 +32,17 @@ class Attendance extends Model
     
     protected $appends = ['time_in_formatted', 'time_out_formatted'];
 
-    /**
-     * Relasi dengan employee
-     */
+
     public function employee()
     {
         return $this->belongsTo(Employee::class);
     }
-    
-    /**
-     * Get formatted time in (or dash if null)
-     */
+
     public function getTimeInFormattedAttribute()
     {
         return $this->time_in ? $this->time_in->format('H:i') : '-';
     }
     
-    /**
-     * Get formatted time out (or dash if null)
-     */
     public function getTimeOutFormattedAttribute()
     {
         return $this->time_out ? $this->time_out->format('H:i') : '-';

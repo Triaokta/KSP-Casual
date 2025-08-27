@@ -61,7 +61,6 @@
                                             ];
                                             $color = $statusColors[$attendance->status] ?? 'secondary';
                                             
-                                            // Format status untuk tampilan yang lebih baik
                                             $statusText = $attendance->status;
                                             if ($statusText == 'tanpa_keterangan') {
                                                 $statusText = 'Tanpa Keterangan';

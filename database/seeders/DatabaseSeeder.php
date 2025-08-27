@@ -17,13 +17,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             DirectorateSeeder::class,
             DepartmentSeeder::class,
-            JabatanSeeder::class,
             UserSeeder::class,
             ConfigSeeder::class,
-            LetterStatusSeeder::class,
-            ClassificationSeeder::class,
-            LetterSeeder::class,
-            DispositionSeeder::class,
         ]);
     }
 }

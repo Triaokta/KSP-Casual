@@ -1,10 +1,3 @@
-<p align="center">
-  <a href="https://404notfound.fun" target="_blank">
-    <img src="https://avatars.githubusercontent.com/u/87377917?s=200&v=4" width="200" alt="404NFID Logo">
-  </a>
-</p>
-
-
 ## KSP-LMS 🚀
 
 Sebuah aplikasi web yang dirancang untuk mengelola karyawan casual, mulai dari input karyawan, import karyawan dengan menggunakan excel, export karyawan dengan tipe xlsx, export karyawan dengan tipe pdf. Selain itu, aplikasi web ini juga menyediakan fitur absensi perhari, sehingga memudahkan admin ketika menghitung gaji karyawan.

@@ -21,9 +21,6 @@ class EmployeeStatusHistory extends Model
         'notes',
     ];
     
-    /**
-     * Get the employee that owns the status history.
-     */
     public function employee()
     {
         return $this->belongsTo(Employee::class);

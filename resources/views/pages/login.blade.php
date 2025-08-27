@@ -27,7 +27,7 @@
         content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
 
-    <title>{{ __('menu.auth.login') }} | {{ config('app.name') }}</title>
+    <title>{{ config('app.name') }}</title>
 
     <meta name="description" content=""/>
 
@@ -88,7 +88,7 @@
                             />
                         </div>
                         <div class="mt-2">
-                            <button class="btn btn-primary d-grid w-100" type="submit">{{ __('menu.auth.login') }}</button>
+                            <button class="btn btn-primary d-grid w-100" type="submit">{{ __('Masuk') }}</button>
                         </div>
                     </form>
                 </div>
